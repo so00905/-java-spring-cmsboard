@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.cmsboard.mapper.BoardMapper">
+
+    <select id="selectTelCode" resultType="java.util.HashMap">
+        select TelName from cms_tel
+    </select>
+
+<!--  게시판리스트뿌리기 + 페이징처리  -->
+    <select id="selectBoard" resultType="java.util.HashMap" parameterType="com.example.cmsboard.vo.SearchVO">
+        select
+            (select x.TelName from cms_tel x where b.TelCode=x.TelCode) as telCode
+            ,(select m.MasterName from cms_master m where b.MasterNo=m.MasterNo) AS mNo
+            ,b.BoardNo  as bNo
+            ,b.BoardTitle as bTitle
+            ,b.BoardContent as bContent
+            ,b.BoardDate as bDate
+            ,b.BoardHit as bHit
+        from (select @rownum:=@rownum+1 as rnum, a.* from cms_board as a,
+        (select @rownum:=0) as r
+        where 1=1
+                <trim>
+                    <if test='searchType=="title" and keyword!=null and keyword !=""'>
+                        and BoardTitle like concat('%',#{keyword},'%')
+                    </if>
+                    <if test='searchType=="content" and keyword!=null and keyword !=""'>
+                        and BoardContent like concat('%',#{keyword},'%')
+                    </if>
+                </trim> ) as b
+        <![CDATA[
+         where rnum>=#{start} and rnum <= #{end}
+        ]]>
+        order by BoardNo;
+    </select>
+
+    <!--  총 게시글 개수 출력  -->
+    <select id="countBoard" resultType="int" parameterType="com.example.cmsboard.vo.SearchVO">
+        select count(*) from cms_board
+        where 1=1
+        <trim>
+            <if test='searchType=="title" and keyword!=null and keyword !=""'>
+                and BoardTitle like concat('%',#{keyword},'%')
+            </if>
+            <if test='searchType=="content" and keyword!=null and keyword !=""'>
+                and BoardContent like concat('%',#{keyword},'%')
+            </if>
+        </trim>
+    </select>
+
+
+    <!-- 게시판 상세보기화면 -->
+    <select id="boardDetail" parameterType="int" resultType="com.example.cmsboard.vo.BoardVO">
+       <![CDATA[
+        select BoardTitle as bTitle
+        ,(select x.TelName from cms_tel x where b.TelCode=x.TelCode) as telNameDetail
+        ,BoardContent as bContent
+        from cms_board b
+        where 1=1 and BoardNo = #{_param}
+
+        ]]>
+    </select>
+
+    <!--  게시판 조회수증가 -->
+    <update id="UpdateHit" parameterType="int">
+        update cms_board set BoardHit = BoardHit + 1 where BoardNo=#{bNo}
+    </update>
+
+
+    <!--게시판 글쓰기-->
+    <insert id="insertBoard" parameterType="String">
+        insert into cms_board( BoardNo
+                               , BoardTitle
+                               , MasterNo
+                               , TelCode
+                               , BoardDate
+                               , BoardContent
+                               , BoardHit)
+        values(
+               (select isnull(max(BoardNo),0)+1 from cms_board)
+              ,#{bTitle}
+              ,(select MasterNo from cms_master where MasterName = #{mNo})
+              ,(select TelCode from cms_tel where TelName=#{telCode})
+              ,now()
+              ,#{bContent}
+              ,0
+              )
+    </insert>
+
+
+
+    <!--  게시판리스트뿌리기 + 페이징처리  -->
+    <select id="selectUserBoard" resultType="java.util.HashMap" parameterType="com.example.cmsboard.vo.UserBoardVO">
+        select
+        (select x.TelName from cms_tel x where c.TelCode=x.TelCode) as telCode
+        ,c.CustomerNo  as cNo
+        ,c.CustomerId as cId
+        ,c.CustomerName as cName
+        ,c.CustomerPhone as cPhone
+        ,c.CustomerDate as cDate
+        from (select @rownum:=@rownum+1 as rnum, a.* from cms_customer as a,
+        (select @rownum:=0) as r
+        where 1=1
+<!--        <trim>-->
+<!--            <if test='searchType=="title" and keyword!=null and keyword !=""'>-->
+<!--                and BoardTitle like concat('%',#{keyword},'%')-->
+<!--            </if>-->
+<!--            <if test='searchType=="content" and keyword!=null and keyword !=""'>-->
+<!--                and BoardContent like concat('%',#{keyword},'%')-->
+<!--            </if>-->
+<!--        </trim> -->
+            ) as c
+        <![CDATA[
+         where rnum>=#{start} and rnum <= #{end}
+        ]]>
+        order by CustomerNo;
+    </select>
+
+    <!--  사용자페이지 총 게시글 개수 출력  -->
+    <select id="countUserBoard" resultType="int" parameterType="com.example.cmsboard.vo.UserBoardVO">
+        select count(*) from cms_customer
+        where 1=1
+<!--        <trim>-->
+<!--            <if test='searchType=="title" and keyword!=null and keyword !=""'>-->
+<!--                and BoardTitle like concat('%',#{keyword},'%')-->
+<!--            </if>-->
+<!--            <if test='searchType=="content" and keyword!=null and keyword !=""'>-->
+<!--                and BoardContent like concat('%',#{keyword},'%')-->
+<!--            </if>-->
+<!--        </trim>-->
+    </select>
+</mapper>

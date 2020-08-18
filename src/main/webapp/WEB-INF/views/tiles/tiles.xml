@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+    <!-- Header / Footer가 제외된 화면 -->
+<!--    <definition name="default" template="/WEB-INF/views/tiles/layout/default.jsp">-->
+<!--        <put-attribute name="body" value="/WEB-INF/views/loginPage.jsp" />-->
+<!--    </definition>-->
+
+<!--    <definition name="error/*" extends="base">-->
+<!--        <put-attribute name="body" value="/WEB-INF/views/error/{1}.jsp" />-->
+<!--    </definition>-->
+
+<!--    <definition name="login" extends="base">-->
+<!--        <put-attribute name="body" value="/WEB-INF/views/loginPage.jsp" />-->
+<!--    </definition>-->
+
+    <definition name="login.definition" template="/WEB-INF/views/tiles/loginLayout/loginPage.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/tiles/loginLayout/header.jsp" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="footer" value="/WEB-INF/views/tiles/loginLayout/footer.jsp" />
+    </definition>
+
+    <definition name="loginPage" extends="login.definition">
+        <put-attribute name="body" value="/WEB-INF/views/loginPage.jsp" />
+    </definition>
+
+
+
+    <definition name="new.definition" template="/WEB-INF/views/tiles/layout/template.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/tiles/layout/header.jsp" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="footer" value="/WEB-INF/views/tiles/layout/footer.jsp" />
+        <put-attribute name="sidebar" value="/WEB-INF/views/tiles/layout/sidebar.jsp" />
+    </definition>
+
+    <!-- Header / Footer / sidebar 가 들어간 기본 화면 -->
+    <definition name="indexPage" extends="new.definition">
+        <put-attribute name="body" value="/WEB-INF/views/boardTable.jsp" />
+    </definition>
+
+    <definition name="boardWrite" extends="new.definition">
+        <put-attribute name="body" value="/WEB-INF/views/boardWrite.jsp" />
+    </definition>
+
+    <definition name="boardDetail" extends="new.definition">
+        <put-attribute name="body" value="/WEB-INF/views/boardDetail.jsp" />
+    </definition>
+
+    <definition name="userTable" extends="new.definition">
+        <put-attribute name="body" value="/WEB-INF/views/userTable.jsp" />
+    </definition>
+
+<!--    <definition name="*" extends="new.definition">-->
+<!--        <put-attribute name="body" value="/WEB-INF/views/{1}.jsp" />-->
+<!--    </definition>-->
+
+    <definition name="/*" extends="/WEB-INF/views/loginPage.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/tiles/loginLayout/header.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/views/tiles/loginLayout/footer.jsp" />
+    </definition>
+
+    <definition name="*/*" extends="new.definition">
+        <put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+    </definition>
+
+    <definition name="*/*/*" extends="new.definition">
+        <put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+    </definition>
+</tiles-definitions>
