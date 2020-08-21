@@ -13,12 +13,12 @@
 
 
 <div class="wrapper wrapper-full-page" style="background-color: cadetblue;">
-    <div class="page-header login-page header-filter" filter-color="black" >
+    <div class="page-header login-page header-filter" filter-color="#01b9ff" >
         <!--   you can change the color of the filter page using: data-color="blue | purple | green | orange | red | rose " -->
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-8 ml-auto mr-auto">
-                    <form name="f" id="formLogin" class="form" method="POST" action="/authenticate">
+                    <form name="f" id="formLogin" class="form" method="POST" action="authenticate">
                         <div class="card card-login">
                             <div class="card-body ">
                                 <p class="card-description text-center" style="color: black;">MASTER LOGIN</p>
@@ -28,30 +28,11 @@
                                     <span class="input-group-text">
                                       <i class="material-icons">face</i>
                                     </span>
-
-                                       <c:if test="${not empty errorMsg}">
-                                        <div style="color: #ff0000;">
-                                            <h3> ${errorMsg} </h3>
-                                        </div>
-                                       </c:if>
-
                                       <div>
-<%--                                          <c:if test="${not empty SPRING_SECURITY_LAST_EXCEPTION}">--%>
-<%--                                              <div style="color: darkred">--%>
-<%--                                                  로그인 실패!!!!!!!!!!!!!!--%>
-<%--                                              <h3>${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</h3>--%>
-<%--                                              <c:remove var="SPRING_SECURITY_LAST_EXCEPTION" scope="session"/>--%>
-<%--                                          </div>--%>
-<%--                                          </c:if>--%>
                                       </div>
                                   </div>
                                   <input type="text" class="form-control" placeholder="아이디를 입력해주세요" id="username" name="loginID" value="${loginID}">
                                 </div>
-
-                                    <c:if test="${not empty SPRING_SECURITY_LAST_EXCEPTION}">
-                                        <p class="error">${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</p>
-                                        <c:remove var="SPRING_SECURITY_LAST_EXCEPTION" scope="session"/> </c:if>
-
 
 
                                </span>
@@ -70,6 +51,18 @@
                             </div>
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                             </div>
+
+                            <c:if test="${not empty SPRING_SECURITY_LAST_EXCEPTION}">
+                                <font color="red">
+                                    <div style="font-weight: bold; maxgin:5%;">
+                                        로그인에 실패했습니다. <br />
+                                          실패이유 :  ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}
+                                    </div>
+                                    <c:remove var="SPRING_SECURITY_LAST_EXCEPTION" scope="session" />
+                                </font>
+                            </c:if>
+
+
                         </div>
                     </form>
 

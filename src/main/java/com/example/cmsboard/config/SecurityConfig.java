@@ -5,9 +5,11 @@ import com.example.cmsboard.controller.AuthProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,6 +17,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import java.util.Locale;
 
 
 @Configuration
@@ -53,9 +57,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .formLogin() // 하위에 내가 직접 구현한 로그인 폼, 로그인 성공시 이동 경로 설정 가능. , 로그인 폼의 아이디,패스워드는 username, password로 맞춰야 함
                             .loginPage("/loginPage") // 로그인이 수행될 경로.
                             .loginProcessingUrl("/authenticate")// 로그인form의  action과 일치시켜주어야 함.
-                            .failureUrl("/loginPage?error")
+
                             .failureHandler(authFailureHandler)
                             .successHandler(authSuccessHandler)
+                             .failureUrl("/loginPage")
 //                             .defaultSuccessUrl("/indexPage") // 로그인 성공 시 이동할 경로.
                              .usernameParameter("loginID")
                             .passwordParameter("loginPwd")
@@ -66,11 +71,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                         .logoutSuccessUrl("/loginPage")
                         .invalidateHttpSession(true)
                     .and()
-                        .csrf()
-                    .and()
                         .authenticationProvider(authProvider);
 //                        .exceptionHandling()
 //                        .accessDeniedPage("/accessDenied_page"); //권한이 없는 자가 접속할 시 보여질 화면
+
+        http.csrf().disable();  //POST방식으로 보낼 수 있도록 설정.
 
     }
 

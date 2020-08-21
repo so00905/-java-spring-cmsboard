@@ -3,11 +3,14 @@ package com.example.cmsboard.config;
 import com.example.cmsboard.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,45 +19,21 @@ import java.io.IOException;
 @Component
 public class AuthFailureHandler implements AuthenticationFailureHandler {
 
-//    @Resource
-//    AccountService accountService;
-//
-//    private String username;
-//    private String password;
-//
-//    private Logger log = LoggerFactory.getLogger(this.getClass());
 
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
+
+        if(exception instanceof AuthenticationServiceException){
+            request.setAttribute("loginFailMsg","존재하지 않는 계정입니다.");
+        }else if(exception instanceof BadCredentialsException) {
+            request.setAttribute("loginFailMsg", "아이디 또는 비밀번호가 이상합니다.");
+        }//
+
+
         System.out.println("######### onAuthenticationFailure #########");
-        response.sendRedirect("/loginPage");
-
-//        log.info("######### onAuthenticationFailure #########");
-//        String loginId = request.getParameter(username);
-//        String loginPwd = request.getParameter(password);
-//response.sendRedirect("/indexPage");
-        //response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-        // 실패 시 response를 json 형태로 결과값 전달
-//        response.getWriter().print("{\"success\": false}");
-//        response.getWriter().flush();
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/loginPage");
+        dispatcher.forward(request, response);
     }
-//
-//    public String getUsername() {
-//        return username;
-//    }
-//
-//    public void setUsername(String username) {
-//        this.username = username;
-//    }
-//
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//    public void setPassword(String password) {
-//        this.password = password;
-//    }
 }

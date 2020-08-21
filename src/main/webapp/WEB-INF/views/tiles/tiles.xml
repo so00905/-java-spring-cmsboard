@@ -53,11 +53,19 @@
         <put-attribute name="body" value="/WEB-INF/views/userTable.jsp" />
     </definition>
 
+    <definition name="UserDetail" extends="new.definition">
+        <put-attribute name="body" value="/WEB-INF/views/UserDetail.jsp" />
+    </definition>
+
+    <definition name="UserReg" extends="new.definition">
+        <put-attribute name="body" value="/WEB-INF/views/UserReg.jsp" />
+    </definition>
+
 <!--    <definition name="*" extends="new.definition">-->
 <!--        <put-attribute name="body" value="/WEB-INF/views/{1}.jsp" />-->
 <!--    </definition>-->
 
-    <definition name="/*" extends="/WEB-INF/views/loginPage.jsp">
+    <definition name="/*" extends="new.definition">
         <put-attribute name="header" value="/WEB-INF/views/tiles/loginLayout/header.jsp" />
         <put-attribute name="footer" value="/WEB-INF/views/tiles/loginLayout/footer.jsp" />
     </definition>

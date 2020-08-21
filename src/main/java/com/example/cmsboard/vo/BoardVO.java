@@ -4,6 +4,15 @@ import javax.xml.crypto.Data;
 import java.util.Date;
 
 public class BoardVO {
+
+
+    private int telCode;
+    private int mNo;
+    private int bNo;
+    private String bTitle;
+    private String bContent;
+    private Date bDate;
+    private int bHit;
     private String telNameDetail;
 
     public String getTelNameDetail() {
@@ -13,15 +22,6 @@ public class BoardVO {
     public void setTelNameDetail(String telNameDetail) {
         this.telNameDetail = telNameDetail;
     }
-
-    private int telCode;
-    private int mNo;
-    private int bNo;
-    private String bTitle;
-    private String bContent;
-    private Date bDate;
-    private int bHit;
-
     //통신사이름 셀렉트박스
     private String TelName;
 

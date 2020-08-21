@@ -55,7 +55,7 @@ public class AuthProvider implements AuthenticationProvider {
                         System.out.println("비밀번호일치!");
                     }
                     else if (!passwordEncoder.matches(loginPwd, userVO.getPassword())) {
-                        throw new BadCredentialsException("Invalid PWD");
+                        throw new BadCredentialsException("패스워드가 일치하지 않습니다.");
                     }
                     return new UsernamePasswordAuthenticationToken(userVO, null, auth);
                 } else {
@@ -65,7 +65,7 @@ public class AuthProvider implements AuthenticationProvider {
 
             } else {
                 // 로그인 정보 없음
-                throw new BadCredentialsException("Invalid Id");
+                throw new BadCredentialsException("존재하지 않는 아이디입니다.");
             }
 
 

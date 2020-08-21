@@ -4,15 +4,24 @@ public class SearchVO {
     // 현재페이지, 시작페이지, 끝페이지, 게시글 총 갯수, 페이지당 글 갯수, 마지막페이지, SQL쿼리에 쓸 start, end
     private int nowPage, startPage, endPage, total, cntPerPage, lastPage, start, end;
     private int cntPage = 5;
-    private String searchType;
+    private String selectTel;
+    private String selectType;
     private String keyword;
 
-    public String getSearchType() {
-        return searchType;
+    public String getSelectTel() {
+        return selectTel;
     }
 
-    public void setSearchType(String searchType) {
-        this.searchType = searchType;
+    public void setSelectTel(String selectTel) {
+        this.selectTel = selectTel;
+    }
+
+    public String getSelectType() {
+        return selectType;
+    }
+
+    public void setSelectType(String selectType) {
+        this.selectType = selectType;
     }
 
     public String getKeyword() {

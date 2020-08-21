@@ -7,7 +7,7 @@
         select TelName from cms_tel
     </select>
 
-<!--  게시판리스트뿌리기 + 페이징처리  -->
+<!--  게시물리스트뿌리기 + 페이징처리  -->
     <select id="selectBoard" resultType="java.util.HashMap" parameterType="com.example.cmsboard.vo.SearchVO">
         select
             (select x.TelName from cms_tel x where b.TelCode=x.TelCode) as telCode
@@ -20,32 +20,40 @@
         from (select @rownum:=@rownum+1 as rnum, a.* from cms_board as a,
         (select @rownum:=0) as r
         where 1=1
-                <trim>
-                    <if test='searchType=="title" and keyword!=null and keyword !=""'>
-                        and BoardTitle like concat('%',#{keyword},'%')
-                    </if>
-                    <if test='searchType=="content" and keyword!=null and keyword !=""'>
-                        and BoardContent like concat('%',#{keyword},'%')
-                    </if>
-                </trim> ) as b
+        <if test='selectTel != null and selectTel.length()>0'>
+            and (select x.TelName from cms_tel x where a.TelCode=x.TelCode)=#{selectTel}
+        </if>
+        <if test='selectType != null and selectType.length()>0'>
+            <if test="selectType.equals('title')">
+                and a.BoardTitle like concat('%',#{keyword},'%')
+            </if>
+            <if test="selectType.equals('content')">
+                and a.BoardContent like concat('%',#{keyword},'%')
+            </if>
+        </if>
+              ) as b
         <![CDATA[
          where rnum>=#{start} and rnum <= #{end}
         ]]>
+
         order by BoardNo;
     </select>
 
     <!--  총 게시글 개수 출력  -->
     <select id="countBoard" resultType="int" parameterType="com.example.cmsboard.vo.SearchVO">
-        select count(*) from cms_board
+        select count(*) from cms_board b
         where 1=1
-        <trim>
-            <if test='searchType=="title" and keyword!=null and keyword !=""'>
-                and BoardTitle like concat('%',#{keyword},'%')
+        <if test='selectTel != null and selectTel.length()>0'>
+            and (select x.TelName from cms_tel x where b.TelCode=x.TelCode)=#{selectTel}
+        </if>
+        <if test='selectType != null and selectType.length()>0'>
+            <if test="selectType.equals('title')">
+                and b.BoardTitle like concat('%',#{keyword},'%')
             </if>
-            <if test='searchType=="content" and keyword!=null and keyword !=""'>
-                and BoardContent like concat('%',#{keyword},'%')
+            <if test="selectType.equals('content')">
+                and b.BoardContent like concat('%',#{keyword},'%')
             </if>
-        </trim>
+        </if>
     </select>
 
 
@@ -55,6 +63,8 @@
         select BoardTitle as bTitle
         ,(select x.TelName from cms_tel x where b.TelCode=x.TelCode) as telNameDetail
         ,BoardContent as bContent
+        ,BoardDate as bDate
+        ,BoardHit as bHit
         from cms_board b
         where 1=1 and BoardNo = #{_param}
 
@@ -67,8 +77,8 @@
     </update>
 
 
-    <!--게시판 글쓰기-->
-    <insert id="insertBoard" parameterType="String">
+    <!--게시판 글쓰기  -->
+    <insert id="insertBoard" parameterType="com.example.cmsboard.vo.BoardVO">
         insert into cms_board( BoardNo
                                , BoardTitle
                                , MasterNo
@@ -77,19 +87,36 @@
                                , BoardContent
                                , BoardHit)
         values(
-               (select isnull(max(BoardNo),0)+1 from cms_board)
+               (select (max(BoardNo))+1 from cms_board as maxNo)
               ,#{bTitle}
-              ,(select MasterNo from cms_master where MasterName = #{mNo})
-              ,(select TelCode from cms_tel where TelName=#{telCode})
+              ,1
+              ,(select TelCode from cms_tel where TelName=#{TelName})
               ,now()
               ,#{bContent}
               ,0
               )
     </insert>
 
+<!--  게시판 글 수정  -->
+    <update id="updateBoard" parameterType="com.example.cmsboard.vo.BoardVO">
+        update cms_board set BoardTitle = #{bTitle}
+                           ,TelCode = (select TelCode from cms_tel where TelName = #{TelName})
+                            ,BoardContent = #{bContent}
+        where BoardNo = #{bNo}
+    </update>
+
+<!--  게시판 글 삭제  -->
+    <delete id="deleteBoard">
+        delete from cms_board where BoardNo=#{bNo}
+    </delete>
 
 
-    <!--  게시판리스트뿌리기 + 페이징처리  -->
+
+
+
+
+
+    <!--  사용자리스트뿌리기 + 페이징처리  -->
     <select id="selectUserBoard" resultType="java.util.HashMap" parameterType="com.example.cmsboard.vo.UserBoardVO">
         select
         (select x.TelName from cms_tel x where c.TelCode=x.TelCode) as telCode
@@ -101,14 +128,20 @@
         from (select @rownum:=@rownum+1 as rnum, a.* from cms_customer as a,
         (select @rownum:=0) as r
         where 1=1
-<!--        <trim>-->
-<!--            <if test='searchType=="title" and keyword!=null and keyword !=""'>-->
-<!--                and BoardTitle like concat('%',#{keyword},'%')-->
-<!--            </if>-->
-<!--            <if test='searchType=="content" and keyword!=null and keyword !=""'>-->
-<!--                and BoardContent like concat('%',#{keyword},'%')-->
-<!--            </if>-->
-<!--        </trim> -->
+        <if test='selectTel != null and selectTel.length()>0'>
+            and (select x.TelName from cms_tel x where a.TelCode=x.TelCode)=#{selectTel}
+        </if>
+        <if test='selectType != null and selectType.length()>0'>
+            <if test="selectType.equals('id')">
+                and a.CustomerId like concat('%',#{keyword},'%')
+            </if>
+            <if test="selectType.equals('name')">
+                and a.CustomerName like concat('%',#{keyword},'%')
+            </if>
+            <if test="selectType.equals('phone')">
+                and a.CustomerPhone like concat('%',#{keyword},'%')
+            </if>
+        </if>
             ) as c
         <![CDATA[
          where rnum>=#{start} and rnum <= #{end}
@@ -118,15 +151,71 @@
 
     <!--  사용자페이지 총 게시글 개수 출력  -->
     <select id="countUserBoard" resultType="int" parameterType="com.example.cmsboard.vo.UserBoardVO">
-        select count(*) from cms_customer
+        select count(*) from cms_customer b
         where 1=1
-<!--        <trim>-->
-<!--            <if test='searchType=="title" and keyword!=null and keyword !=""'>-->
-<!--                and BoardTitle like concat('%',#{keyword},'%')-->
-<!--            </if>-->
-<!--            <if test='searchType=="content" and keyword!=null and keyword !=""'>-->
-<!--                and BoardContent like concat('%',#{keyword},'%')-->
-<!--            </if>-->
-<!--        </trim>-->
+       <if test='selectTel != null and selectTel.length()>0'>
+            and (select x.TelName from cms_tel x where b.TelCode=x.TelCode)=#{selectTel}
+        </if>
+        <if test='selectType != null and selectType.length()>0'>
+            <if test="selectType.equals('id')">
+                and b.CustomerId like concat('%',#{keyword},'%')
+            </if>
+            <if test="selectType.equals('name')">
+                and b.CustomerName like concat('%',#{keyword},'%')
+            </if>
+            <if test="selectType.equals('phone')">
+                and b.CustomerPhone like concat('%',#{keyword},'%')
+            </if>
+        </if>
     </select>
+
+    <!--사용자 등록 -->
+    <insert id="insertUser" parameterType="com.example.cmsboard.vo.UserBoardVO">
+        insert into cms_customer( CustomerNo
+                             , CustomerId
+                             , CustomerPwd
+                             , TelCode
+                             , CustomerName
+                             , CustomerPhone
+                             , CustomerDate)
+        values(
+               (select (max(CustomerNo))+1 from cms_customer as maxUserNo)
+              ,#{cId}
+              ,#{cPwd}
+              ,(select TelCode from cms_tel where TelName=#{telName})
+              ,#{cName}
+              ,#{cPhone}
+              ,now()
+              )
+    </insert>
+
+    <!-- 사용자 상세보기화면 -->
+    <select id="UserDetail" parameterType="int" resultType="com.example.cmsboard.vo.UserBoardVO">
+       <![CDATA[
+        select CustomerId as cId
+             ,(select x.TelName from cms_tel x where b.TelCode=x.TelCode) as telName
+             ,CustomerName as cName
+             ,CustomerPwd as cPwd
+             ,CustomerPhone as cPhone
+        from cms_customer b
+        where 1=1 and CustomerNo = #{_param}
+
+        ]]>
+    </select>
+
+    <!--  사용자 정보수정  -->
+    <update id="updateUser" parameterType="com.example.cmsboard.vo.UserBoardVO">
+        update cms_customer set
+                                CustomerId = #{cId}
+                              ,CustomerName = #{cName}
+                              ,CustomerPwd = #{cPwd}
+                              ,CustomerPhone = #{cPhone}
+                                ,TelCode = (select TelCode from cms_tel where TelName = #{telName})
+        where CustomerNo = #{cNo}
+    </update>
+
+    <!--  사용자 정보삭제  -->
+    <delete id="deleteUser">
+        delete from cms_customer where CustomerNo=#{cNo}
+    </delete>
 </mapper>
