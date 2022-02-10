@@ -57,7 +57,7 @@ public class MasterController {
         return model;
     }
 
-    // LOGIN SUCCESS   ffㄹㄹ 이게 성공시에 페이지 뿌려주는건가요 만들어놓긴 헀는데 여기로 안가고
+    // LOGIN SUCCESS  
     @RequestMapping("/loginSuccess")
     public String loginSuccess() {
         return "adminPage";
